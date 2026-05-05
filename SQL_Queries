@@ -1,0 +1,65 @@
+
+#step 1: consolidated retail dataset (master query)
+scenario: the data is stored in normalized tables (orders, products, customers).
+we need to join them using inner join to build the master view for spotfire.
+
+select 
+    o.orderid,
+    o.orderdate,
+    o.shipdate,
+    o.shipmode,
+    c.customerid,
+    c.segment as customersegment,
+    c.country,  
+    c.region,
+    p.productid,
+    p.category as productcategory,
+    p.subcategory,
+    p.productname,
+    o.sales,
+    o.quantity,
+    o.discount,
+    o.profit,
+    -- calculating dynamic profit margin at row level
+    round((o.profit / o.sales) * 100, 2) as rowprofitmarginpercent
+from orders_table o
+inner join customers_table c on o.customerid = c.customerid
+inner join products_table p on o.productid = p.productid
+where o.sales is not null and o.profit is not null;
+
+
+step 2: strategic insights exploration (page 1 & 2 validation)
+scenario: verifying specific product categories (e.g., technology) 
+and auditing high-revenue markets before feeding data to the treemap.
+
+select 
+    p.category,
+    c.region,
+    count(distinct o.orderid) as totalorders,
+    sum(o.sales) as totalsales,
+    sum(o.profit) as totalprofit,
+    round((sum(o.profit) / sum(o.sales)) * 100, 2) as categorymarginpercent
+from orders_table o
+inner join customers_table c on o.customerid = c.customerid
+inner join products_table p on o.productid = p.productid
+where p.category like '%technology%' or p.category like '%office%'
+group by p.category, c.region
+order by totalprofit desc;
+
+
+
+select 
+    o.orderid,
+    p.productname,
+    o.sales,
+    o.profit,
+    -- flagging the transaction risk category
+    case 
+        when o.profit < 0 and o.sales > 1000 then 'critical margin leak'
+        when o.profit < 0 then 'negative margin'
+        else 'profitable'
+    end as transactionriskstatus
+from orders_table o
+inner join products_table p on o.productid = p.productid
+where o.profit < 0
+order by o.sales desc, o.profit asc;
