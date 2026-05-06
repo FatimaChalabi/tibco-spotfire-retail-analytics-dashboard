@@ -42,18 +42,3 @@ Before importing the data into Spotfire, SQL was utilized to structure, clean, a
 * **Key Components:**
   * **Profit vs. Sales Scatter Plot:** The core analytical visual mapping individual transactions.
   * **Profitability Analysis by Transaction:** By unaggregating data points using the `Marker By: Order ID` mechanism, this chart plots hundreds of individual orders against a linear fit/trend line. This enables instantaneous discovery of low-volume high-profit wins and high-risk, negative-margin (bleeding) transactions.
-
----
-
-## 💡 Technical Challenges Solved
-* **Granular Unaggregation (`Marker By` Optimization):** Overcame default tool aggregation limitations to break down high-level bubbles into individual `Order ID` markers, allowing for true outlier detection in the scatter plot.
-* **Interactive Axis Engineering:** Cleaned and structured X and Y-axis expressions (`Sales` and `Profit`) to eliminate misleading mathematical sum-pre-aggregations, ensuring mathematically precise data placement.
-* **Cross-Visual Interactivity:** Configured Spotfire's `Marking` and dynamic filtering systems, meaning clicking on a specific region in the Treemap instantly isolates and filters the transaction points on the Scatter Plot.
-
----
-
-## 📁 Repository Structure
-* `/SQL_Queries` - Scripts used for data manipulation, inner joins, and cleaning.
-* `Global_Retail_Performance_Analysis.dxp` - The main TIBCO Spotfire dashboard file.
-* `/Data` - The raw performance dataset used for the analysis.
-* `/Screenshots` - High-resolution images showing the interactive pages of the project.
